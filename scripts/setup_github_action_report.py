@@ -68,6 +68,7 @@ def main() -> int:
         "Daily Personal Briefing",
     )
     send_report_email = bool_env("INPUT_SEND_EMAIL", True)
+    send_ideas_email = bool_env("INPUT_SEND_IDEAS_EMAIL", True)
 
     PROFILES_DIR.mkdir(parents=True, exist_ok=True)
     (REPO_ROOT / "history").mkdir(parents=True, exist_ok=True)
@@ -101,7 +102,8 @@ def main() -> int:
         "NUM_WORKERS": read_env("IDEER_NUM_WORKERS", "6"),
         "GENERATE_REPORT": "1",
         "SEND_REPORT_EMAIL": "1" if send_report_email else "0",
-        "SKIP_SOURCE_EMAILS": "1",
+        "GENERATE_IDEAS": "1",
+        "SKIP_SOURCE_EMAILS": "0" if send_ideas_email else "1",
         "REPORT_TITLE": report_title,
         "REPORT_MIN_SCORE": read_env("IDEER_REPORT_MIN_SCORE", "4.0"),
         "REPORT_MAX_ITEMS": read_env("IDEER_REPORT_MAX_ITEMS", "18"),
