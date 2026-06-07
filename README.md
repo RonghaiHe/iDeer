@@ -162,7 +162,9 @@ python main.py --sources arxiv semanticscholar huggingface --save --skip_source_
 |------|------|------|
 | `IDEER_PROVIDER` | LLM provider | 默认 `openai` |
 | `IDEER_TEMPERATURE` | 采样温度 | 默认 `0.5` |
-| `IDEER_DAILY_SOURCES` | 选择要跑哪些源 | 默认 `github arxiv semanticscholar huggingface rss` |
+| `IDEER_DAILY_SOURCES` | 每天都会跑的源 | 默认 `github arxiv semanticscholar huggingface rss` |
+| `IDEER_WEEKLY_SOURCES` | **每周一**额外加入的源 | 留空则仅跑每日源；例如 `twitter pubmed` |
+| `IDEER_WEEKLY_DAY` | 每周源的执行日 | 默认 `Monday`，填入英文星期名（大小写不敏感） |
 | `IDEER_REPORT_TITLE` | 邮件标题 | 默认 `Daily Personal Briefing` |
 | `IDEER_RESEARCHER_PROFILE_TEXT` | 更完整的研究者画像 | 会用于报告生成 |
 | `IDEER_NUM_WORKERS` | 并发 worker 数 | 默认 `6`，GitHub Actions 上不建议盲目调太高 |
@@ -206,11 +208,12 @@ python main.py --sources arxiv semanticscholar huggingface --save --skip_source_
 
 #### 怎么选数据源
 
-- 通过 `IDEER_DAILY_SOURCES` 这个 Secret 选择
+- 通过 `IDEER_DAILY_SOURCES` 和 `IDEER_WEEKLY_SOURCES` 两个 Secret 选择
+- 每天执行：`IDEER_DAILY_SOURCES` 中的源
+- 每周一执行：`IDEER_DAILY_SOURCES` + `IDEER_WEEKLY_SOURCES` 合并（可通过 `IDEER_WEEKLY_DAY` 改日子）
 - 写成空格分隔，例如：
-  - `github arxiv`
-  - `github huggingface semanticscholar`
-  - `arxiv semanticscholar huggingface twitter`
+  - `github arxiv`（每日）
+  - `twitter pubmed`（每周一额外跑）
 - 如果启用了某个源，但没填它必需的 API 配置，运行时会失败
 
 #### 怎么用
