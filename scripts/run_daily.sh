@@ -23,7 +23,35 @@ else
   echo "No usable Python interpreter found." >&2
   exit 1
 fi
-SOURCES=(${DAILY_SOURCES:-arxiv semanticscholar huggingface rss})
+# resolve weekly / daily sources based on current day of week
+WEEKLY_DAY="${WEEKLY_DAY:-Monday}"
+WEEKLY_SOURCES="${WEEKLY_SOURCES:-}"
+
+# map day name -> number (1=Monday .. 7=Sunday)
+day_of_week() {
+  case "$(echo "$1" | tr '[:upper:]' '[:lower:]')" in
+    monday)    echo 1 ;;
+    tuesday)   echo 2 ;;
+    wednesday) echo 3 ;;
+    thursday)  echo 4 ;;
+    friday)    echo 5 ;;
+    saturday)  echo 6 ;;
+    sunday)    echo 7 ;;
+    *)         echo 1 ;;
+  esac
+}
+
+TODAY_NUM=$(date +%u)
+WEEKLY_NUM=$(day_of_week "$WEEKLY_DAY")
+
+if [ -n "$WEEKLY_SOURCES" ] && [ "$TODAY_NUM" -eq "$WEEKLY_NUM" ]; then
+  DAILY_SOURCES="${DAILY_SOURCES:-arxiv semanticscholar huggingface rss}"
+  SOURCES=(${DAILY_SOURCES} ${WEEKLY_SOURCES})
+  echo "[Schedule] Weekly day ($WEEKLY_DAY) — running daily + weekly sources"
+else
+  SOURCES=(${DAILY_SOURCES:-arxiv semanticscholar huggingface rss})
+  echo "[Schedule] Non-weekly day — running daily sources only"
+fi
 ARXIV_CATEGORIES=(${ARXIV_CATEGORIES:-cs.AI cs.CL cs.LG})
 GH_LANGUAGES=(${GH_LANGUAGES:-all})
 HF_CONTENT_TYPES=(${HF_CONTENT_TYPES:-papers})

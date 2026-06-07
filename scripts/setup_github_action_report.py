@@ -86,6 +86,9 @@ def main() -> int:
     if x_accounts.strip():
         write_text(PROFILES_DIR / "x_accounts.txt", x_accounts)
 
+    weekly_sources = read_env("IDEER_WEEKLY_SOURCES", "")
+    weekly_day = read_env("IDEER_WEEKLY_DAY", "Monday")
+
     env_map: dict[str, str] = {
         "PROVIDER": provider,
         "MODEL_NAME": model_name,
@@ -99,6 +102,8 @@ def main() -> int:
         "SMTP_PASSWORD": smtp_password,
         "DESCRIPTION_FILE": "profiles/description.txt",
         "DAILY_SOURCES": daily_sources,
+        "WEEKLY_SOURCES": weekly_sources,
+        "WEEKLY_DAY": weekly_day,
         "NUM_WORKERS": read_env("IDEER_NUM_WORKERS", "6"),
         "GENERATE_REPORT": "1",
         "SEND_REPORT_EMAIL": "1" if send_report_email else "0",
