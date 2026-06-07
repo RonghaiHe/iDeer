@@ -297,7 +297,7 @@ def load_config_data() -> dict:
     file_backed_values = {
         "description": _read_text_if_exists(DESCRIPTION_FILE),
         "researcher_profile": _read_text_if_exists(RESEARCHER_PROFILE_FILE),
-        "x_accounts": _read_text_if_exists(TWITTER_ACCOUNTS_FILE),
+        "x_accounts": os.getenv("IDEER_X_ACCOUNTS") or _read_text_if_exists(TWITTER_ACCOUNTS_FILE),
     }
     for key, value in file_backed_values.items():
         if value and not config.get(key):

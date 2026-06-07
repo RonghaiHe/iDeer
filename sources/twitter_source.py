@@ -141,6 +141,10 @@ class TwitterSource(BaseSource):
             raise ValueError("Twitter/X source requires --x_rapidapi_key (or --x_api_key).")
 
         accounts_file = source_args.get("accounts_file", "profiles/x_accounts.txt")
+        env_x_accounts = os.getenv("IDEER_X_ACCOUNTS")
+        if env_x_accounts:
+            with open(accounts_file, "w", encoding="utf-8") as f:
+                f.write(env_x_accounts.strip() + "\n")
         static_accounts = load_accounts(accounts_file)
         persisted_accounts = load_accounts(self.discovery_persist_file) if os.path.exists(self.discovery_persist_file) else []
 
