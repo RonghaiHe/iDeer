@@ -148,21 +148,23 @@ Supported frequencies: **daily, weekdays, weekly, monthly**.
 ```text
 Your interest profile + Google Scholar (multiple profiles supported)
      ↓
-┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐
-│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar │  │ X/Twitter │
-└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘
-     │              │              │                 │                 │
-     └──────────────┴──────────────┴────────┬────────┴─────────────────┘
+┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐
+│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar│  │ X/Twitter │  │  Zotero   │
+└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘
+     │              │              │                │                 │              │
+     └──────────────┴──────────────┴────────┬───────┴─────────────────┴──────────────┘
                                             ↓
-                                     LLM scoring + filtering
+                     LLM scoring + filtering (Zotero similarity re-ranking)
                                             ↓
                                ┌────────────┼────────────┐
                                ↓            ↓            ↓
                             Digests       Report        Ideas
                                ↓            ↓            ↓
-                                      Email delivery
+                                       Email delivery
                                             ↓
-                               Scheduled automation
+                               ┌────────────────────────────────────┐
+                               │  Scheduled delivery (weekday opt)  │
+                               └────────────────────────────────────┘
 ```
 
 ## More Capabilities
@@ -173,6 +175,7 @@ Your interest profile + Google Scholar (multiple profiles supported)
 - **🖥️ Desktop client**: local GUI workflow. See [Desktop Demo](./docs/DESKTOP_DEMO.md).
 - **🔌 Claude Code Skill**: use iDeer as a Claude Code skill.
 - **🤖 Codex Daily Paper Skill**: use [skills/ideer-daily-paper/SKILL.md](./skills/ideer-daily-paper/SKILL.md) to teach Codex how to run daily paper reading, summarization, email delivery, and automation setup in a consistent way.
+- **📚 Zotero paper re-ranking**: re-rank daily recommendations against your Zotero library via TF-IDF similarity plus researcher profile overlap.
 
 ## Using Codex for Daily Paper Automation
 

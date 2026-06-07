@@ -78,6 +78,11 @@ if [ "${SKIP_SOURCE_EMAILS:-0}" = "1" ]; then
   SOURCE_EMAIL_ARGS+=(--skip_source_emails)
 fi
 
+ZOTERO_ARGS=()
+if [ "${ZOTERO_ASSIST_SELECT:-0}" = "1" ]; then
+  ZOTERO_ARGS+=(--zotero_assist_select)
+fi
+
 "$PYTHON_BIN" main.py \
   --sources "${SOURCES[@]}" \
   --description "${DESCRIPTION_FILE:-profiles/description.txt}" \
@@ -103,4 +108,5 @@ fi
   --rss_max_items "${RSS_MAX_ITEMS:-30}" \
   "${SOURCE_EMAIL_ARGS[@]}" \
   "${REPORT_ARGS[@]}" \
-  "${IDEA_ARGS[@]}"
+  "${IDEA_ARGS[@]}" \
+  "${ZOTERO_ARGS[@]}"

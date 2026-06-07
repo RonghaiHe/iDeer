@@ -195,6 +195,14 @@ python main.py --sources arxiv semanticscholar huggingface --save --skip_source_
 | `IDEER_X_USE_PERSISTED_ACCOUNTS` | X 自动发现时 | 是否复用历史发现结果 |
 | `IDEER_X_SKIP_DISCOVERY_IF_PERSISTED` | X 自动发现时 | 有持久化结果时跳过重新发现 |
 | `IDEER_X_DISCOVERY_PERSIST_FILE` | X 自动发现时 | 默认 `state/x_accounts.discovered.txt` |
+| `IDEER_ZOTERO_USER_ID` | 你启用 Zotero 辅助选文时 | Zotero 用户 ID |
+| `IDEER_ZOTERO_API_KEY` | 你启用 Zotero 辅助选文时 | Zotero API Key |
+| `IDEER_ZOTERO_INCLUDE_PATH` | 你启用 Zotero 辅助选文时 | 只包含匹配 glob 的 collection 路径下的论文 |
+| `IDEER_ZOTERO_IGNORE_PATH` | 你启用 Zotero 辅助选文时 | 排除匹配 glob 的 collection 路径 |
+| `IDEER_ZOTERO_ASSIST_WEIGHT` | 你启用 Zotero 辅助选文时 | 辅助评分权重，默认 `1.5` |
+| `IDEER_ZOTERO_ASSIST_TOP_K` | 你启用 Zotero 辅助选文时 | 辅助评分后每个源保留 Top K 条（0 = 全部保留） |
+| `IDEER_ZOTERO_ASSIST_PROFILE_FILE` | 你启用 Zotero 辅助选文时 | 研究者画像路径，默认 `profiles/researcher_profile.md` |
+| `IDEER_ZOTERO_ASSIST_MAX_ITEMS` | 你启用 Zotero 辅助选文时 | Zotero 文献库读取上限，默认 `2000` |
 
 #### 怎么选数据源
 
@@ -572,13 +580,13 @@ A：当前实现是指令式模式，只处理 `/help`、`/status`、`/run`、`/
 ```
 你的兴趣画像 + Google Scholar（支持多个）
      ↓
-┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐
-│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar │  │ X/Twitter │
-└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘
-     │              │              │                 │                 │
-     └──────────────┴──────────────┴────────┬────────┴─────────────────┘
-                                            ↓
-                                     LLM 评分 + 筛选
+┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐
+│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar │  │ X/Twitter │  │  Zotero   │
+└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘
+     │              │              │                 │                 │              │
+     └──────────────┴──────────────┴────────┬────────┴─────────────────┴──────────────┘
+                                             ↓
+                         LLM 评分 + 筛选 (含 Zotero 相似度辅助重排序)
                                             ↓
                                ┌────────────┼────────────┐
                                ↓            ↓            ↓
@@ -604,6 +612,7 @@ A：当前实现是指令式模式，只处理 `/help`、`/status`、`/run`、`/
 - **🤖 Codex Daily Paper Skill** — 内置 [`skills/ideer-daily-paper/SKILL.md`](./skills/ideer-daily-paper/SKILL.md)，让 Codex 按统一流程完成每日论文阅读、自动整理、邮件发送和自动化调度
 - **🛡️ 书安 InternShannon Skill** — 内置 [`skills/ideer-daily-paper-chatbot/SKILL.md`](./skills/ideer-daily-paper-chatbot/SKILL.md)，让书安 Agent 代读 raw items，自己生成摘要、评分、报告和 ideas
 - **📚 Zotero 自动同步** — Swipe 右划自动存入 Zotero；每日推荐高分论文一键同步；资料库批量导出。需要 Zotero 7 + `zotero_save.py`
+- **📚 Zotero 辅助选文** — 基于你的 Zotero 文献库 TF-IDF 相似度 + 研究者画像匹配，对每日推荐进行二次排序，把与你研究积累更相关的论文优先推送
 
 ## 用 Agent 做每日论文自动化
 

@@ -122,6 +122,11 @@ def main():
                         help="Min score for Zotero auto-sync (default: 7)")
     parser.add_argument("--zotero_collection", type=str, default="",
                         help="Zotero collection name (default: iDeer Daily {date})")
+    parser.add_argument(
+        "--zotero_assist_select",
+        action="store_true",
+        help="Use Zotero library to assist paper selection with description/profile context",
+    )
 
     # Cross-source report config
     parser.add_argument("--generate_report", action="store_true", help="Generate a personalized cross-source report")
@@ -293,6 +298,46 @@ def main():
         for source_name in args.sources:
             _, recs = _run_source(source_name)
             all_recs[source_name] = recs
+
+    if args.zotero_assist_select:
+        print(f"\n{'='*60}")
+        print("Applying Zotero-assisted paper selection...")
+        print(f"{'='*60}")
+
+        zotero_user_id = os.getenv("ZOTERO_USER_ID", "")
+        zotero_api_key = os.getenv("ZOTERO_API_KEY", "")
+        if not zotero_user_id or not zotero_api_key:
+            print("ZOTERO_USER_ID and ZOTERO_API_KEY are required in .env or secrets for --zotero_assist_select, otherswise skip Zotero-assisted selection.")
+        else:
+            from core.zotero_assist import assist_recommendations_with_zotero
+
+            zotero_assist_profile = os.getenv("ZOTERO_ASSIST_PROFILE_FILE", "profiles/researcher_profile.md")
+            profile_path = zotero_assist_profile if os.path.exists(zotero_assist_profile) else ""
+            if zotero_assist_profile and not profile_path:
+                print(f"[zotero-assist] Profile file not found, fallback to description only: {zotero_assist_profile}")
+
+            def _env_list(name: str) -> list[str] | None:
+                value = os.getenv(name)
+                if value in (None, ""):
+                    return None
+                return [item for item in value.split(',') if item]
+
+            all_recs, assist_stats = assist_recommendations_with_zotero(
+                all_recs=all_recs,
+                description_text=description_text,
+                researcher_profile_path=profile_path,
+                user_id=zotero_user_id,
+                api_key=zotero_api_key,
+                include_path=_env_list("ZOTERO_INCLUDE_PATH"),
+                ignore_path=_env_list("ZOTERO_IGNORE_PATH"),
+                weight=float(os.getenv("ZOTERO_ASSIST_WEIGHT") or "1.5"),
+                top_k_per_source=int(os.getenv("ZOTERO_ASSIST_TOP_K") or "0"),
+                max_corpus_items=int(os.getenv("ZOTERO_ASSIST_MAX_ITEMS") or "2000"),
+            )
+            print(
+                "[zotero-assist] Corpus={zotero_corpus_size}, Re-ranked={recommendation_count}, "
+                "TopK={top_k_per_source}, Weight={weight}".format(**assist_stats)
+            )
 
     if args.generate_report:
         print(f"\n{'='*60}")

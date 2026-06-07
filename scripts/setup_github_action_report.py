@@ -138,6 +138,15 @@ def main() -> int:
             "IDEER_X_DISCOVERY_PERSIST_FILE",
             "state/x_accounts.discovered.txt",
         ),
+        "ZOTERO_USER_ID": read_env("IDEER_ZOTERO_USER_ID", ""),
+        "ZOTERO_API_KEY": read_env("IDEER_ZOTERO_API_KEY", ""),
+        "ZOTERO_ASSIST_SELECT": 1 if "IDEER_ZOTERO_USER_ID" != "" and "IDEER_ZOTERO_API_KEY" != "" else 0,
+        "ZOTERO_INCLUDE_PATH": read_env("IDEER_ZOTERO_INCLUDE_PATH", ""),
+        "ZOTERO_IGNORE_PATH": read_env("IDEER_ZOTERO_IGNORE_PATH", ""),
+        "ZOTERO_ASSIST_WEIGHT": read_env("IDEER_ZOTERO_ASSIST_WEIGHT", "1.5"),
+        "ZOTERO_ASSIST_TOP_K": read_env("IDEER_ZOTERO_ASSIST_TOP_K", "0"),
+        "ZOTERO_ASSIST_PROFILE_FILE": read_env("IDEER_ZOTERO_ASSIST_PROFILE_FILE", "profiles/researcher_profile.md"),
+        "ZOTERO_ASSIST_MAX_ITEMS": read_env("IDEER_ZOTERO_ASSIST_MAX_ITEMS", "2000"),
     }
 
     if report_profile_file:
