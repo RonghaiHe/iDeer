@@ -35,6 +35,10 @@ def get_paper_block_html(
                style="display: inline-block; text-decoration: none; font-size: 14px;
                       font-weight: bold; color: #fff; background-color: #b31b1b;
                       padding: 8px 16px; border-radius: 6px;">PDF</a>
+            <a href="https://www.alphaxiv.org/abs/{arxiv_id}"
+               style="display: inline-block; text-decoration: none; font-size: 14px;
+                      font-weight: bold; color: #fff; background-color: #b13938;
+                      padding: 8px 16px; border-radius: 6px; margin-left: 8px;">AlphaXiv</a>
         </td>
     </tr>
 </table>
