@@ -4,7 +4,19 @@ def get_paper_block_html(
     arxiv_id: str,
     summary: str,
     pdf_url: str,
+    zotero_save_url: str = "",
 ) -> str:
+    zotero_btn = ""
+    if zotero_save_url:
+        zotero_btn = (
+            '<tr><td style="padding:4px 0;">'
+            '<a href="{url}" '
+            'style="display:inline-block;text-decoration:none;font-size:12px;'
+            'font-weight:bold;color:#333;background-color:#f2f2f2;'
+            'padding:6px 10px;border-radius:4px;">'
+            '\U0001f4da Save to Zotero</a>'
+            '</td></tr>'.format(url=zotero_save_url)
+        )
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%"
            style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px;
@@ -41,6 +53,7 @@ def get_paper_block_html(
                       padding: 8px 16px; border-radius: 6px; margin-left: 8px;">AlphaXiv</a>
         </td>
     </tr>
+    {zotero_row}
 </table>
 """
     return block_template.format(
@@ -49,4 +62,5 @@ def get_paper_block_html(
         arxiv_id=arxiv_id,
         summary=summary,
         pdf_url=pdf_url,
+        zotero_row=zotero_btn,
     )

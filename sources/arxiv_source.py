@@ -110,12 +110,17 @@ class ArxivSource(BaseSource):
 
     def render_item_html(self, item: dict) -> str:
         rate = get_stars(item.get("score", 0))
+        abstract_url = item.get("url", "")
+        paper_url = item.get("pdf_url", "") or abstract_url
+        from urllib.parse import quote
+        zotero_save = f"https://www.zotero.org/save/?q={quote(abstract_url, safe='')}" if abstract_url else ""
         return get_paper_block_html(
             item["title"],
             rate,
             item.get("arxiv_id", ""),
             item["summary"],
             item.get("pdf_url", ""),
+            zotero_save_url=zotero_save,
         )
 
     def get_theme_color(self) -> str:
