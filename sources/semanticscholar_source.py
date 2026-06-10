@@ -181,6 +181,7 @@ class SemanticScholarSource(BaseSource):
             "summary": self._ensure_str(data["summary"]),
             "score": float(data["relevance"]),
             "url": item.get("url", ""),
+            "doi": item.get("doi", ""),
             "authors": item.get("authors", ""),
             "venue": item.get("venue", ""),
             "year": str(item.get("year", "")),
@@ -189,6 +190,14 @@ class SemanticScholarSource(BaseSource):
 
     def render_item_html(self, item: dict) -> str:
         rate = get_stars(item.get("score", 0))
+        doi = item.get("doi", "")
+        paper_url = f"https://doi.org/{doi}" if doi else item.get("url", "")
+        from urllib.parse import quote
+        if doi:
+            zotero_save = f"https://www.zotero.org/save/?q=https://doi.org/{doi}"
+        else:
+            s2_url = item.get("url", "")
+            zotero_save = f"https://www.zotero.org/save/?q={quote(s2_url, safe='')}" if s2_url else ""
         return get_paper_block_html(
             item["title"],
             rate,
@@ -197,7 +206,8 @@ class SemanticScholarSource(BaseSource):
             str(item.get("year", "")),
             item.get("citation_count", 0),
             item["summary"],
-            item.get("url", ""),
+            paper_url,
+            zotero_save_url=zotero_save,
         )
 
     def get_theme_color(self) -> str:
