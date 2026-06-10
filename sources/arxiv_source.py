@@ -109,11 +109,33 @@ class ArxivSource(BaseSource):
         }
 
     def render_item_html(self, item: dict) -> str:
+        import os
+        from urllib.parse import quote
+
         rate = get_stars(item.get("score", 0))
         abstract_url = item.get("url", "")
         paper_url = item.get("pdf_url", "") or abstract_url
-        from urllib.parse import quote
         zotero_save = f"https://www.zotero.org/save/?q={quote(abstract_url, safe='')}" if abstract_url else ""
+
+        github_owner = os.environ.get("GITHUB_TARGET_OWNER", "")
+        github_repo = os.environ.get("GITHUB_TARGET_REPO", "")
+        github_url = ""
+        if github_owner and github_repo:
+            arxiv_id = item.get("arxiv_id", "")
+            title = item.get("title", "")
+            issue_title = f"[arXiv:{arxiv_id}] {title}"
+            issue_body = (
+                f"arxiv_id: {arxiv_id}\n"
+                f"title: {title}\n"
+                f"url: {abstract_url}\n"
+                f"pdf_url: {item.get('pdf_url', '')}"
+            )
+            github_url = (
+                f"https://github.com/{github_owner}/{github_repo}/issues/new"
+                f"?title={quote(issue_title)}"
+                f"&body={quote(issue_body)}"
+            )
+
         return get_paper_block_html(
             item["title"],
             rate,
@@ -121,6 +143,7 @@ class ArxivSource(BaseSource):
             item["summary"],
             item.get("pdf_url", ""),
             zotero_save_url=zotero_save,
+            github_issue_url=github_url,
         )
 
     def get_theme_color(self) -> str:

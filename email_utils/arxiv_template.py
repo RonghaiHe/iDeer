@@ -5,6 +5,7 @@ def get_paper_block_html(
     summary: str,
     pdf_url: str,
     zotero_save_url: str = "",
+    github_issue_url: str = "",
 ) -> str:
     zotero_btn = ""
     if zotero_save_url:
@@ -16,6 +17,17 @@ def get_paper_block_html(
             'padding:6px 10px;border-radius:4px;">'
             '\U0001f4da Save to Zotero</a>'
             '</td></tr>'.format(url=zotero_save_url)
+        )
+    github_btn = ""
+    if github_issue_url:
+        github_btn = (
+            '<tr><td style="padding:4px 0;">'
+            '<a href="{url}" '
+            'style="display:inline-block;text-decoration:none;font-size:12px;'
+            'font-weight:bold;color:#fff;background-color:#000000;'
+            'padding:6px 10px;border-radius:4px;">'
+            '\U0001f4da Add to Online Paper Reader</a>'
+            '</td></tr>'.format(url=github_issue_url)
         )
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%"
@@ -54,6 +66,7 @@ def get_paper_block_html(
         </td>
     </tr>
     {zotero_row}
+    {github_row}
 </table>
 """
     return block_template.format(
@@ -63,4 +76,5 @@ def get_paper_block_html(
         summary=summary,
         pdf_url=pdf_url,
         zotero_row=zotero_btn,
+        github_row=github_btn,
     )
