@@ -178,6 +178,7 @@ Your interest profile + Google Scholar (multiple profiles supported)
 - **🔌 Claude Code Skill**: use iDeer as a Claude Code skill.
 - **🤖 Codex Daily Paper Skill**: use [skills/ideer-daily-paper/SKILL.md](./skills/ideer-daily-paper/SKILL.md) to teach Codex how to run daily paper reading, summarization, email delivery, and automation setup in a consistent way.
 - **📚 Zotero paper re-ranking**: re-rank daily recommendations against your Zotero library via TF-IDF similarity plus researcher profile overlap.
+- **📚 Add to Library**: create a GitHub Issue directly from arXiv emails with one click, automatically passing paper information to a target repository for further automation (e.g., auto-download PDF, classification, archival).
 
 ## Using Codex for Daily Paper Automation
 

@@ -205,6 +205,8 @@ python main.py --sources arxiv semanticscholar huggingface --save --skip_source_
 | `IDEER_ZOTERO_ASSIST_TOP_K` | 你启用 Zotero 辅助选文时 | 辅助评分后每个源保留 Top K 条（0 = 全部保留） |
 | `IDEER_ZOTERO_ASSIST_PROFILE_FILE` | 你启用 Zotero 辅助选文时 | 研究者画像路径，默认 `profiles/researcher_profile.md` |
 | `IDEER_ZOTERO_ASSIST_MAX_ITEMS` | 你启用 Zotero 辅助选文时 | Zotero 文献库读取上限，默认 `2000` |
+| `IDEER_GITHUB_TARGET_OWNER` | 你想在邮件中一键创建 Issue 时 | 目标 GitHub 仓库所有者（用户名） |
+| `IDEER_GITHUB_TARGET_REPO` | 你想在邮件中一键创建 Issue 时 | 目标 GitHub 仓库名称 |
 
 #### 怎么选数据源
 
@@ -616,6 +618,7 @@ A：当前实现是指令式模式，只处理 `/help`、`/status`、`/run`、`/
 - **🛡️ 书安 InternShannon Skill** — 内置 [`skills/ideer-daily-paper-chatbot/SKILL.md`](./skills/ideer-daily-paper-chatbot/SKILL.md)，让书安 Agent 代读 raw items，自己生成摘要、评分、报告和 ideas
 - **📚 Zotero 自动同步** — Swipe 右划自动存入 Zotero；每日推荐高分论文一键同步；资料库批量导出。需要 Zotero 7 + `zotero_save.py`
 - **📚 Zotero 辅助选文** — 基于你的 Zotero 文献库 TF-IDF 相似度 + 研究者画像匹配，对每日推荐进行二次排序，把与你研究积累更相关的论文优先推送
+- **📚 Add to Library** — 在 arXiv 邮件中一键创建 GitHub Issue，将论文信息自动传递到指定仓库，便于后续自动化处理（如自动下载 PDF、分类归档等）
 
 ## 用 Agent 做每日论文自动化
 

@@ -152,6 +152,8 @@ def main() -> int:
         "ZOTERO_ASSIST_TOP_K": read_env("IDEER_ZOTERO_ASSIST_TOP_K", "0"),
         "ZOTERO_ASSIST_PROFILE_FILE": read_env("IDEER_ZOTERO_ASSIST_PROFILE_FILE", "profiles/researcher_profile.md"),
         "ZOTERO_ASSIST_MAX_ITEMS": read_env("IDEER_ZOTERO_ASSIST_MAX_ITEMS", "2000"),
+        "GITHUB_TARGET_OWNER": read_env("IDEER_GITHUB_TARGET_OWNER", ""),
+        "GITHUB_TARGET_REPO": read_env("IDEER_GITHUB_TARGET_REPO", ""),
     }
 
     if report_profile_file:

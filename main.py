@@ -128,6 +128,16 @@ def main():
         help="Use Zotero library to assist paper selection with description/profile context",
     )
 
+    # GitHub Target Repository (for "Add to Library" button in emails)
+    parser.add_argument(
+        "--github_target_owner", type=str, default=env_str("GITHUB_TARGET_OWNER"),
+        help="GitHub username of the target repository for 'Add to Library' button",
+    )
+    parser.add_argument(
+        "--github_target_repo", type=str, default=env_str("GITHUB_TARGET_REPO"),
+        help="GitHub repository name for 'Add to Library' button",
+    )
+
     # Cross-source report config
     parser.add_argument("--generate_report", action="store_true", help="Generate a personalized cross-source report")
     parser.add_argument(

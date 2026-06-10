@@ -90,6 +90,8 @@ jobs:
       IDEER_ZOTERO_ASSIST_TOP_K: ${{ secrets.IDEER_ZOTERO_ASSIST_TOP_K }}
       IDEER_ZOTERO_ASSIST_PROFILE_FILE: ${{ secrets.IDEER_ZOTERO_ASSIST_PROFILE_FILE }}
       IDEER_ZOTERO_ASSIST_MAX_ITEMS: ${{ secrets.IDEER_ZOTERO_ASSIST_MAX_ITEMS }}
+      IDEER_GITHUB_TARGET_OWNER: ${{ secrets.IDEER_GITHUB_TARGET_OWNER }}
+      IDEER_GITHUB_TARGET_REPO: ${{ secrets.IDEER_GITHUB_TARGET_REPO }}
       INPUT_SOURCES: ${{ github.event.inputs.sources }}
       INPUT_REPORT_TITLE: ${{ github.event.inputs.report_title }}
       INPUT_RECEIVER: ${{ github.event.inputs.receiver }}

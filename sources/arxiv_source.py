@@ -17,6 +17,8 @@ class ArxivSource(BaseSource):
         self.categories = source_args.get("categories", ["cs.AI"])
         self.max_entries = source_args.get("max_entries", 100)
         self.max_papers = source_args.get("max_papers", 60)
+        self.github_target_owner = source_args.get("github_target_owner", "")
+        self.github_target_repo = source_args.get("github_target_repo", "")
 
         cache_key = f"papers_{'_'.join(sorted(self.categories))}_{self.max_entries}"
         cached = self._load_fetch_cache(cache_key)
@@ -51,6 +53,8 @@ class ArxivSource(BaseSource):
             "categories": args.arxiv_categories,
             "max_entries": args.arxiv_max_entries,
             "max_papers": args.arxiv_max_papers,
+            "github_target_owner": args.github_target_owner,
+            "github_target_repo": args.github_target_repo,
         }
 
     def get_max_items(self) -> int:
@@ -109,7 +113,6 @@ class ArxivSource(BaseSource):
         }
 
     def render_item_html(self, item: dict) -> str:
-        import os
         from urllib.parse import quote
 
         rate = get_stars(item.get("score", 0))
@@ -117,10 +120,8 @@ class ArxivSource(BaseSource):
         paper_url = item.get("pdf_url", "") or abstract_url
         zotero_save = f"https://www.zotero.org/save/?q={quote(abstract_url, safe='')}" if abstract_url else ""
 
-        github_owner = os.environ.get("GITHUB_TARGET_OWNER", "")
-        github_repo = os.environ.get("GITHUB_TARGET_REPO", "")
         github_url = ""
-        if github_owner and github_repo:
+        if self.github_target_owner and self.github_target_repo:
             arxiv_id = item.get("arxiv_id", "")
             title = item.get("title", "")
             issue_title = f"[arXiv:{arxiv_id}] {title}"
@@ -131,7 +132,7 @@ class ArxivSource(BaseSource):
                 f"pdf_url: {item.get('pdf_url', '')}"
             )
             github_url = (
-                f"https://github.com/{github_owner}/{github_repo}/issues/new"
+                f"https://github.com/{self.github_target_owner}/{self.github_target_repo}/issues/new"
                 f"?title={quote(issue_title)}"
                 f"&body={quote(issue_body)}"
             )

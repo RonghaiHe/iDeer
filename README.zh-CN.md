@@ -178,6 +178,7 @@ bash scripts/run_daily.sh
 - **🔌 Claude Code Skill** — 支持作为 Claude Code 技能集成
 - **🤖 Codex Daily Paper Skill** — 内置 [`skills/ideer-daily-paper/SKILL.md`](./skills/ideer-daily-paper/SKILL.md)，让 Codex 按统一流程完成每日论文阅读、自动整理、邮件发送和自动化调度
 - **📚 Zotero 辅助选文** — 基于你的 Zotero 文献库 TF-IDF 相似度 + 研究者画像匹配，对每日推荐进行二次排序，把与你研究积累更相关的论文优先推送
+- **📚 Add to Library** — 在 arXiv 邮件中一键创建 GitHub Issue，将论文信息自动传递到指定仓库，便于后续自动化处理（如自动下载 PDF、分类归档等）
 
 ## 用 Codex 做每日论文自动化
 

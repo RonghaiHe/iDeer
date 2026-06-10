@@ -111,6 +111,11 @@ if [ "${ZOTERO_ASSIST_SELECT:-0}" = "1" ]; then
   ZOTERO_ARGS+=(--zotero_assist_select)
 fi
 
+GITHUB_TARGET_ARGS=()
+if [ -n "${GITHUB_TARGET_OWNER:-}" ] && [ -n "${GITHUB_TARGET_REPO:-}" ]; then
+  GITHUB_TARGET_ARGS+=(--github_target_owner "${GITHUB_TARGET_OWNER}" --github_target_repo "${GITHUB_TARGET_REPO}")
+fi
+
 "$PYTHON_BIN" main.py \
   --sources "${SOURCES[@]}" \
   --description "${DESCRIPTION_FILE:-profiles/description.txt}" \
@@ -137,4 +142,5 @@ fi
   "${SOURCE_EMAIL_ARGS[@]}" \
   "${REPORT_ARGS[@]}" \
   "${IDEA_ARGS[@]}" \
-  "${ZOTERO_ARGS[@]}"
+  "${ZOTERO_ARGS[@]}" \
+  "${GITHUB_TARGET_ARGS[@]}"
