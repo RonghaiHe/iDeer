@@ -407,12 +407,24 @@ class BaseSource(ABC):
                 server.ehlo()
         except Exception as e:
             print(f"Primary SMTP mode failed: {e}, trying SSL fallback...")
-            server = smtplib.SMTP_SSL(email_config.smtp_server, email_config.smtp_port, timeout=20)
+            try:
+                server = smtplib.SMTP_SSL(email_config.smtp_server, email_config.smtp_port, timeout=20)
+            except Exception as e2:
+                print(f"SMTP connection failed: {e2}")
+                return
 
-        server.login(email_config.sender, email_config.sender_password)
-        server.sendmail(email_config.sender, receivers, msg.as_string())
-        server.quit()
-        print(f"Email '{title}' sent to {receivers}")
+        try:
+            server.login(email_config.sender, email_config.sender_password)
+            server.sendmail(email_config.sender, receivers, msg.as_string())
+            server.quit()
+            print(f"Email '{title}' sent to {receivers}")
+        except smtplib.SMTPAuthenticationError as e:
+            print(f"SMTP authentication failed: {e}")
+            print("Check SMTP_PASSWORD (use 163.com 客户端授权码, not login password)")
+            server.quit()
+        except Exception as e:
+            print(f"SMTP send failed: {e}")
+            server.quit()
 
     def send_email(self, email_config: EmailConfig, title: str | None = None):
         title = title or self.default_title
