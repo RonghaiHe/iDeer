@@ -99,8 +99,8 @@ def render_report_email(report: dict) -> str:
     """
 
     overview = f"""
-    <div style="padding:24px 26px;border-radius:18px;background:linear-gradient(135deg,#f8fafc,#eef2ff);
-                border:1px solid #dbeafe;box-shadow:0 18px 45px rgba(15,23,42,0.08);margin-bottom:28px;">
+    <div style="padding:24px 26px;border-radius:18px;background-color:#e4ecf4;
+                border:2px solid #8aacc8;margin-bottom:28px;">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#4338ca;text-transform:uppercase;">
         今日主线
       </div>

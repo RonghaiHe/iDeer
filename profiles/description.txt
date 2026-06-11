@@ -1,18 +1,19 @@
-I am a researcher focused on AI Agent Safety. My core research interests span the following areas:
+I am a researcher focused on **Multi-Agent Systems, Graph Rigidity, and Sensor Network Localization**. My core research interests span the following areas:
 
-1. Agent Safety — Safety of LLM-based autonomous agents, including unsafe tool use, unintended side effects, goal misgeneralization, out-of-distribution behavior, and safe exploration in agentic workflows.
+1. Multi-Agent Formation Control - Cooperative control of networked robotic systems, distributed coordination, consensus, formation stabilization, formation maneuvering, leader–follower architectures, and scalable control strategies for large-scale multi-agent systems.
 
-2. Hallucination — Factual errors, confabulation, and grounding failures in LLMs and agents; detection, mitigation, and evaluation of hallucination; retrieval-augmented generation as a countermeasure.
+2. Graph Rigidity Theory - Distance rigidity, bearing rigidity, infinitesimal rigidity, persistence, and graph-theoretic methods for analyzing and guaranteeing formation shape maintenance, uniqueness, stability, and observability in networked systems.
 
-3. Misalignment — Value misalignment, reward hacking, specification gaming, Goodhart's Law, and failures of RLHF/RLAIF; scalable oversight, weak-to-strong generalization, and alignment evaluation.
+3. Sensor Network Localization - Distributed and centralized localization algorithms, distance-only localization, anchor-free localization, relative pose estimation, and geometric optimization methods for recovering positions and orientations from network measurements.
 
-4. Deception — LLM deceptive behavior, sycophancy, sandbagging, hidden reasoning, strategic manipulation, and dishonesty in agents; detecting and eliciting deceptive behavior.
+4. Distributed Control and Estimation - Decentralized controller design, distributed optimization, cooperative state estimation, observer design, resilience to communication constraints, and robustness against measurement uncertainty in multi-agent networks.
 
-5. Codex / Code Agents — Safety of code-generating models and autonomous coding agents (e.g., OpenHands, SWE-agent, Codex); vulnerabilities introduced by agent-generated code, backdoors, and code-level attacks.
+5. Motion Planning and Trajectory Generation - Path planning, trajectory optimization, collision avoidance, formation reconfiguration, cooperative navigation, and motion coordination for autonomous robotic teams operating in dynamic environments.
 
-6. Prompt Optimization & Attacks — Adversarial prompts, jailbreaks, prompt injection, automated red-teaming, and prompt optimization methods (e.g., APE, GCG, AutoDAN); defenses and robustness to prompt-level attacks.
+6. Geometric and Optimization-Based Robotics - Geometric control, manifold-based estimation, constrained optimization, nonlinear system analysis, and the integration of estimation, planning, and control within a unified framework for autonomous systems.
 
-I am NOT interested in: computer vision safety, hardware security, network intrusion detection, classical ML robustness unrelated to LLMs.
+I am NOT interested in: pure machine learning methods without geometric or control-theoretic foundations, computer vision tasks unrelated to localization or robotics, hardware design, network security, or general-purpose AI systems without applications to multi-agent coordination.
 
 IMPORTANT: When generating the summary, please organize the content BY EACH of my six interest directions above.
-For each direction, list the most relevant papers/repos/items separately with a brief explanation of why each is relevant to my research. Prioritize items that sit at the intersection of multiple directions (e.g., deceptive agents, misaligned code agents, prompt-based attacks on agent safety).
+
+For each direction, list the most relevant papers, algorithms, theoretical results, software frameworks, and open research problems separately, with a brief explanation of why each is relevant to my research. Prioritize works that sit at the intersection of multiple directions (e.g., rigidity-based formation control, localization under distance constraints, distributed estimation and control, or motion planning for cooperative multi-agent systems).
