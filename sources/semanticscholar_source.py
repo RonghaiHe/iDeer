@@ -10,7 +10,7 @@ from datetime import datetime
 
 from sources.base import BaseSource
 from core.config import LLMConfig, CommonConfig
-from fetchers.semanticscholar_fetcher import fetch_papers_for_queries
+from fetchers.semanticscholar_fetcher import fetch_papers_for_queries, DEFAULT_SORT, _get_default_year
 from email_utils.base_template import get_stars
 from email_utils.semanticscholar_template import get_paper_block_html
 
@@ -24,8 +24,10 @@ class SemanticScholarSource(BaseSource):
         self.queries = source_args.get("queries", [])
         self.max_results = source_args.get("max_results", 60)
         self.max_papers = source_args.get("max_papers", 30)
-        self.year_filter = source_args.get("year", "")
+        # Apply default year filter (current year onwards) if not specified
+        self.year_filter = source_args.get("year", "") or _get_default_year()
         self.fields_of_study = source_args.get("fields_of_study", [])
+        self.sort = source_args.get("sort", DEFAULT_SORT)
         self.api_key = source_args.get("api_key", "")
 
         # If no explicit queries, derive from the interest description
@@ -36,9 +38,7 @@ class SemanticScholarSource(BaseSource):
         query_sig = hashlib.sha256(
             "|".join(sorted(self.queries)).encode()
         ).hexdigest()[:10]
-        cache_key = f"papers_{query_sig}_{self.max_results}"
-        if self.year_filter:
-            cache_key += f"_{self.year_filter}"
+        cache_key = f"papers_{query_sig}_{self.max_results}_{self.year_filter}"
         cached = self._load_fetch_cache(cache_key)
         if cached is not None:
             self.raw_papers = cached
@@ -46,8 +46,9 @@ class SemanticScholarSource(BaseSource):
             self.raw_papers = fetch_papers_for_queries(
                 self.queries,
                 max_results_per_query=self.max_results,
-                year=self.year_filter or None,
+                year=self.year_filter,
                 fields_of_study=self.fields_of_study or None,
+                sort=self.sort,
                 api_key=self.api_key,
             )
             if self.raw_papers:
@@ -119,6 +120,10 @@ class SemanticScholarSource(BaseSource):
             "--ss_api_key", type=str, default="",
             help="[SemanticScholar] Optional API key for higher rate limits",
         )
+        parser.add_argument(
+            "--ss_sort", type=str, default=DEFAULT_SORT,
+            help="[SemanticScholar] Sort order, e.g. 'publicationDate:asc' (从早到晚) or 'publicationDate:desc'",
+        )
 
     @staticmethod
     def extract_args(args) -> dict:
@@ -128,6 +133,7 @@ class SemanticScholarSource(BaseSource):
             "max_papers": args.ss_max_papers,
             "year": args.ss_year,
             "fields_of_study": args.ss_fields_of_study,
+            "sort": args.ss_sort,
             "api_key": args.ss_api_key,
         }
 

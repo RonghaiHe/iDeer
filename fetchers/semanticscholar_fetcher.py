@@ -11,16 +11,24 @@ from __future__ import annotations
 
 import random
 import time
+from datetime import datetime
 from typing import Any
 
 import requests
 
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
 FIELDS = "title,abstract,url,year,citationCount,referenceCount,publicationVenue,authors,externalIds,publicationDate"
+# Sort options for bulk search: publicationDate:asc (从早到晚) or publicationDate:desc (从晚到早)
+DEFAULT_SORT = "publicationDate:desc"
 DEFAULT_TIMEOUT = 30
 DEFAULT_HEADERS = {
     "User-Agent": "iDeer-daily-recommender/1.0",
 }
+
+
+def _get_default_year() -> str:
+    """Return default year filter: current year onwards (e.g. '2025-')."""
+    return f"{datetime.now().year}-"
 
 
 def search_recent_papers(
@@ -28,6 +36,7 @@ def search_recent_papers(
     max_results: int = 60,
     year: str | None = None,
     fields_of_study: list[str] | None = None,
+    sort: str = DEFAULT_SORT,
     timeout: int = DEFAULT_TIMEOUT,
     api_key: str = "",
 ) -> list[dict[str, Any]]:
@@ -41,15 +50,23 @@ def search_recent_papers(
         Maximum number of papers to return.
     year : str | None
         Year filter, e.g. "2024-" for papers from 2024 onward.
+        Defaults to current year onwards (e.g. "2025-") if not specified.
     fields_of_study : list[str] | None
         Optional Semantic Scholar field of study filters
         (e.g. ["Computer Science", "Medicine"]).
+    sort : str
+        Sort order for results. Default is "publicationDate:desc" (从晚到早).
+        Options: "publicationDate:asc" or "publicationDate:desc".
     api_key : str
         Optional Semantic Scholar API key for higher rate limits.
     """
     headers = dict(DEFAULT_HEADERS)
     if api_key:
         headers["x-api-key"] = api_key
+
+    # Apply default year filter to ensure only recent papers are returned
+    if not year:
+        year = _get_default_year()
 
     papers: list[dict[str, Any]] = []
     offset = 0
@@ -61,14 +78,15 @@ def search_recent_papers(
             "limit": batch,
             "offset": offset,
             "fields": FIELDS,
+            "sort": sort,
+            "year": year,
         }
-        if year:
-            params["year"] = year
         if fields_of_study:
             params["fieldsOfStudy"] = ",".join(fields_of_study)
 
+        # Use bulk endpoint which supports sort parameter
         resp = requests.get(
-            f"{BASE_URL}/paper/search",
+            f"{BASE_URL}/paper/search/bulk",
             params=params,
             headers=headers,
             timeout=timeout,
@@ -104,6 +122,7 @@ def fetch_papers_for_queries(
     max_results_per_query: int = 40,
     year: str | None = None,
     fields_of_study: list[str] | None = None,
+    sort: str = DEFAULT_SORT,
     api_key: str = "",
     sleep_range: tuple[float, float] = (1.0, 3.0),
 ) -> list[dict[str, Any]]:
@@ -115,6 +134,7 @@ def fetch_papers_for_queries(
             max_results=max_results_per_query,
             year=year,
             fields_of_study=fields_of_study,
+            sort=sort,
             api_key=api_key,
         )
         for paper in results:
