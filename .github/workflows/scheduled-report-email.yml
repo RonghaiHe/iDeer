@@ -74,7 +74,6 @@ jobs:
       IDEER_SS_YEAR: ${{ secrets.IDEER_SS_YEAR }}
       IDEER_SS_FIELDS_OF_STUDY: ${{ secrets.IDEER_SS_FIELDS_OF_STUDY }}
       IDEER_SS_API_KEY: ${{ secrets.IDEER_SS_API_KEY }}
-      SS_DEBUG: "1"
       IDEER_X_RAPIDAPI_KEY: ${{ secrets.IDEER_X_RAPIDAPI_KEY }}
       IDEER_X_RAPIDAPI_HOST: ${{ secrets.IDEER_X_RAPIDAPI_HOST }}
       IDEER_X_ACCOUNTS: ${{ secrets.IDEER_X_ACCOUNTS }}
