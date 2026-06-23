@@ -9,6 +9,7 @@ Docs: https://api.semanticscholar.org/
 
 from __future__ import annotations
 
+import os
 import random
 import time
 from datetime import datetime
@@ -39,6 +40,7 @@ def search_recent_papers(
     sort: str = DEFAULT_SORT,
     timeout: int = DEFAULT_TIMEOUT,
     api_key: str = "",
+    _debug: bool = False,
 ) -> list[dict[str, Any]]:
     """Search for recent papers matching *query*.
 
@@ -71,6 +73,7 @@ def search_recent_papers(
     papers: list[dict[str, Any]] = []
     offset = 0
     batch = min(100, max_results)
+    url = f"{BASE_URL}/paper/search/bulk"
 
     while len(papers) < max_results:
         params: dict[str, Any] = {
@@ -84,13 +87,17 @@ def search_recent_papers(
         if fields_of_study:
             params["fieldsOfStudy"] = ",".join(fields_of_study)
 
-        # Use bulk endpoint which supports sort parameter
-        resp = requests.get(
-            f"{BASE_URL}/paper/search/bulk",
-            params=params,
-            headers=headers,
-            timeout=timeout,
-        )
+        if _debug:
+            _safe_key = f"{api_key[:8]}..." if api_key else "(none)"
+            print(f"[semanticscholar][debug] GET {url}")
+            print(f"[semanticscholar][debug] params={params}")
+            print(f"[semanticscholar][debug] x-api-key={_safe_key}")
+
+        resp = requests.get(url, params=params, headers=headers, timeout=timeout)
+
+        if _debug:
+            print(f"[semanticscholar][debug] status={resp.status_code}")
+
         if resp.status_code == 429:
             print("[semanticscholar] Rate limited, sleeping 5s...")
             time.sleep(5)
@@ -99,6 +106,13 @@ def search_recent_papers(
 
         data = resp.json()
         batch_papers = data.get("data", [])
+        total = data.get("total", 0)
+
+        if _debug:
+            print(f"[semanticscholar][debug] total={total}, batch={len(batch_papers)}, offset={offset}")
+            if not batch_papers:
+                print(f"[semanticscholar][debug] raw response keys={list(data.keys())}")
+
         if not batch_papers:
             break
 
@@ -107,7 +121,6 @@ def search_recent_papers(
             if len(papers) >= max_results:
                 break
 
-        total = data.get("total", 0)
         offset += len(batch_papers)
         if offset >= total:
             break
@@ -128,7 +141,10 @@ def fetch_papers_for_queries(
 ) -> list[dict[str, Any]]:
     """Fetch papers for multiple query strings, dedup by paperId."""
     seen: dict[str, dict] = {}
-    for query in queries:
+    _debug = os.environ.get("SS_DEBUG", "") == "1"
+    _keyed_empty = False
+
+    for qi, query in enumerate(queries):
         results = search_recent_papers(
             query,
             max_results=max_results_per_query,
@@ -136,7 +152,22 @@ def fetch_papers_for_queries(
             fields_of_study=fields_of_study,
             sort=sort,
             api_key=api_key,
+            _debug=_debug,
         )
+
+        if not results and api_key and not _keyed_empty:
+            _keyed_empty = True
+            print(f"[semanticscholar] 0 results with API key for query {qi+1}/{len(queries)}, retrying without key...")
+            results = search_recent_papers(
+                query,
+                max_results=max_results_per_query,
+                year=year,
+                fields_of_study=fields_of_study,
+                sort=sort,
+                api_key="",
+                _debug=_debug,
+            )
+
         for paper in results:
             pid = paper.get("paper_id", "")
             if pid and pid not in seen:
