@@ -68,7 +68,9 @@ if [ -n "${SS_QUERIES:-}" ]; then
 fi
 
 if [ -n "${SS_FIELDS_OF_STUDY:-Computer Science}" ]; then
-  IFS='|' read -r -a SS_FIELD_VALUES <<< "${SS_FIELDS_OF_STUDY:-Computer Science}"
+  _SS_FOS_NORM="${SS_FIELDS_OF_STUDY:-Computer Science}"
+  _SS_FOS_NORM="${_SS_FOS_NORM//$'\x60'/|}"
+  IFS='|' read -r -a SS_FIELD_VALUES <<< "$_SS_FOS_NORM"
   SS_FIELD_ARGS=(--ss_fields_of_study "${SS_FIELD_VALUES[@]}")
 fi
 

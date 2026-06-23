@@ -85,7 +85,10 @@ def search_recent_papers(
             "year": year,
         }
         if fields_of_study:
-            params["fieldsOfStudy"] = ",".join(fields_of_study)
+            _raw = ",".join(fields_of_study)
+            _raw = _raw.replace("`", ",")
+            _clean = [f.strip() for f in _raw.split(",") if f.strip()]
+            params["fieldsOfStudy"] = ",".join(_clean)
 
         if _debug:
             _safe_key = f"{api_key[:8]}..." if api_key else "(none)"
