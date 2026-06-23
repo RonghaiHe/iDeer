@@ -74,6 +74,8 @@ def search_recent_papers(
     offset = 0
     batch = min(100, max_results)
     url = f"{BASE_URL}/paper/search/bulk"
+    _retries = 0
+    _max_retries = 3
 
     while len(papers) < max_results:
         params: dict[str, Any] = {
@@ -88,6 +90,7 @@ def search_recent_papers(
             _raw = ",".join(fields_of_study)
             _raw = _raw.replace("`", ",")
             _clean = [f.strip() for f in _raw.split(",") if f.strip()]
+            _clean = [f.title() for f in _clean]
             params["fieldsOfStudy"] = ",".join(_clean)
 
         if _debug:
@@ -105,7 +108,18 @@ def search_recent_papers(
             print("[semanticscholar] Rate limited, sleeping 5s...")
             time.sleep(5)
             continue
+        if resp.status_code >= 500:
+            _retries += 1
+            if _retries <= _max_retries:
+                _wait = 2 ** _retries
+                print(f"[semanticscholar] Server error {resp.status_code}, retry {_retries}/{_max_retries} in {_wait}s...")
+                time.sleep(_wait)
+                continue
+            else:
+                print(f"[semanticscholar] Server error {resp.status_code} after {_max_retries} retries, giving up on query.")
+                break
         resp.raise_for_status()
+        _retries = 0
 
         data = resp.json()
         batch_papers = data.get("data", [])
