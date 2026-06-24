@@ -126,6 +126,8 @@ def main() -> int:
         "HF_MAX_MODELS": read_env("IDEER_HF_MAX_MODELS", "15"),
         "RSS_URLS": read_env("IDEER_RSS_URLS", "https://imjuya.github.io/juya-ai-daily/rss.xml"),
         "RSS_MAX_ITEMS": read_env("IDEER_RSS_MAX_ITEMS", "30"),
+        "RSS_JOURNALS": read_env("IDEER_RSS_JOURNALS", ""),
+        "RSS_JOURNAL_MAX_ITEMS": read_env("IDEER_RSS_JOURNAL_MAX_ITEMS", "50"),
         "SS_QUERIES": read_env("IDEER_SS_QUERIES", ""),
         "SS_MAX_RESULTS": read_env("IDEER_SS_MAX_RESULTS", "60"),
         "SS_MAX_PAPERS": read_env("IDEER_SS_MAX_PAPERS", "30"),

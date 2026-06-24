@@ -46,10 +46,13 @@ WEEKLY_NUM=$(day_of_week "$WEEKLY_DAY")
 
 if [ -n "$WEEKLY_SOURCES" ] && [ "$TODAY_NUM" -eq "$WEEKLY_NUM" ]; then
   DAILY_SOURCES="${DAILY_SOURCES:-arxiv semanticscholar huggingface rss}"
+  WEEKLY_SOURCES="${WEEKLY_SOURCES:-twitter pubmed rss_journals}"
   SOURCES=(${DAILY_SOURCES} ${WEEKLY_SOURCES})
+  IS_WEEKLY_DAY=1
   echo "[Schedule] Weekly day ($WEEKLY_DAY) — running daily + weekly sources"
 else
   SOURCES=(${DAILY_SOURCES:-arxiv semanticscholar huggingface rss})
+  IS_WEEKLY_DAY=0
   echo "[Schedule] Non-weekly day — running daily sources only"
 fi
 ARXIV_CATEGORIES=(${ARXIV_CATEGORIES:-cs.AI cs.CL cs.LG})

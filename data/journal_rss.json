@@ -1,0 +1,76 @@
+{
+  "journals": {
+    "IEEE TAC": {
+      "full_name": "IEEE Transactions on Automatic Control",
+      "rss_url": "https://ieeexplore.ieee.org/rss/TOC9.XML",
+      "publisher": "IEEE",
+      "issn": "0018-9286"
+    },
+    "Automatica": {
+      "full_name": "Automatica",
+      "rss_url": "http://rss.sciencedirect.com/publication/science/00051098",
+      "publisher": "Elsevier",
+      "issn": "0005-1098"
+    },
+    "Science Robotics": {
+      "full_name": "Science Robotics",
+      "rss_url": "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=scirobotics",
+      "publisher": "AAAS",
+      "issn": "2470-9476"
+    },
+    "IEEE TRO": {
+      "full_name": "IEEE Transactions on Robotics",
+      "rss_url": "https://ieeexplore.ieee.org/rss/TOC8860.XML",
+      "publisher": "IEEE",
+      "issn": "1552-3098"
+    },
+    "IEEE TASE": {
+      "full_name": "IEEE Transactions on Automation Science and Engineering",
+      "rss_url": "https://ieeexplore.ieee.org/rss/TOC8856.XML",
+      "publisher": "IEEE",
+      "issn": "1545-5955"
+    },
+    "IEEE RAL": {
+      "full_name": "IEEE Robotics and Automation Letters",
+      "rss_url": "https://ieeexplore.ieee.org/rss/TOC7083369.XML",
+      "publisher": "IEEE",
+      "issn": "2377-3766"
+    },
+    "IJRR": {
+      "full_name": "The International Journal of Robotics Research",
+      "rss_url": "https://dl.acm.org/action/showFeed?type=etoc&feed=rss&jc=rbrs",
+      "publisher": "SAGE/ACM",
+      "issn": "0278-3649"
+    },
+    "RAS": {
+      "full_name": "Robotics and Autonomous Systems",
+      "rss_url": "http://rss.sciencedirect.com/publication/science/09218890",
+      "publisher": "Elsevier",
+      "issn": "0921-8890"
+    },
+    "ICRA": {
+      "full_name": "IEEE International Conference on Robotics and Automation",
+      "rss_url": null,
+      "publisher": "IEEE",
+      "note": "Annual conference; URL needs year update annually"
+    },
+    "IROS": {
+      "full_name": "IEEE/RSJ International Conference on Intelligent Robots and Systems",
+      "rss_url": null,
+      "publisher": "IEEE",
+      "note": "No reliable RSS feed available"
+    },
+    "IEEE CDC": {
+      "full_name": "IEEE Conference on Decision and Control",
+      "rss_url": null,
+      "publisher": "IEEE",
+      "note": "No reliable RSS feed available"
+    },
+    "RSS": {
+      "full_name": "Robotics: Science and Systems",
+      "rss_url": null,
+      "publisher": "RSS Conference",
+      "note": "No reliable RSS feed available"
+    }
+  }
+}

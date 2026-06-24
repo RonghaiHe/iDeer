@@ -139,6 +139,8 @@ I care about LLM agents, AI infra, open-source model releases, evaluation, safet
 | `IDEER_HF_MAX_MODELS` | 你启用了 `huggingface` |
 | `IDEER_RSS_URLS` | 你启用了 `rss`，默认 Juya AI Daily |
 | `IDEER_RSS_MAX_ITEMS` | 你启用了 `rss` |
+| `IDEER_RSS_JOURNALS` | 你启用了 `rss_journals`，期刊名称用 `\|` 分隔 |
+| `IDEER_RSS_JOURNAL_MAX_ITEMS` | 你启用了 `rss_journals`，默认 `50` |
 | `IDEER_SS_QUERIES` | 你启用了 `semanticscholar` 并想手工指定 query |
 | `IDEER_SS_MAX_RESULTS` | 你启用了 `semanticscholar` |
 | `IDEER_SS_MAX_PAPERS` | 你启用了 `semanticscholar` |

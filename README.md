@@ -86,6 +86,10 @@ iDeer 通过 Semantic Scholar 覆盖 **2 亿+ 跨学科论文**，自动匹配�
 | **PubMed**            | 3600 万+ 生物医学文献         | 搜索词、天数范围、数量         |
 | **Semantic Scholar**  | 2 亿+ 跨学科论文（WoS 替代）  | 搜索词、年份、领域、数量       |
 | **X / Twitter**       | 技术讨论 + 行业动态           | 账号列表、自动发现、回溯窗口   |
+| **RSS**               | 任意 RSS/Atom 订阅源          | XML 地址列表，每天执行         |
+| **RSS Journals**      | 预置期刊 + 自定义期刊         | 期刊名称列表，每周执行         |
+
+> **RSS Journals** —— 独立源，输入期刊名称（如 `IEEE TRO`、`IJRR`），自动解析对应的 RSS feed 地址。预置 12 个机器人学/控制领域期刊，支持用户自定义扩展。详见 `data/journal_rss.json`。默认在 `WEEKLY_SOURCES` 中（每周执行一次）。期刊源最大抓取数量由 `RSS_JOURNAL_MAX_ITEMS` 控制（默认 50），与通用 RSS 的 `RSS_MAX_ITEMS`（默认 30）独立。
 
 > **插件化设计** —— 想加新源？继承 `BaseSource`，实现抽象方法，注册到 `SOURCE_REGISTRY`，完事。
 
@@ -176,6 +180,8 @@ python main.py --sources arxiv semanticscholar huggingface --save --skip_source_
 | `IDEER_ARXIV_CATEGORIES` | 你启用了 arXiv 时 | 例如 `cs.AI cs.CL cs.LG` |
 | `IDEER_ARXIV_MAX_ENTRIES` | 你启用了 arXiv 时 | 原始抓取数量上限 |
 | `IDEER_RSS_URLS` | 你启用了 RSS 时 | 默认 `https://imjuya.github.io/juya-ai-daily/rss.xml` |
+| `IDEER_RSS_JOURNALS` | 你启用了 RSS 期刊订阅时 | 期刊名称，用 `\|` 分隔，例如 `IEEE TRO\|IJRR` |
+| `IDEER_RSS_JOURNAL_MAX_ITEMS` | 你启用了 RSS 期刊订阅时 | 期刊源最大抓取数量，默认 `50` |
 | `IDEER_ARXIV_MAX_PAPERS` | 你启用了 arXiv 时 | 最终推荐论文数量上限 |
 | `IDEER_GH_LANGUAGES` | 你启用了 GitHub 时 | 例如 `python typescript` 或 `all` |
 | `IDEER_GH_SINCE` | 你启用了 GitHub 时 | `daily` / `weekly` / `monthly` |
@@ -335,6 +341,11 @@ ideer fetch rss --max 10                       # 抓取默认 RSS 订阅
 ideer clean --dry-run                          # 预览缓存占用
 ideer clean --before 2026-04-01               # 清理旧数据
 ideer serve                                    # 启动 Web UI
+
+# 期刊 RSS
+python -m core.journal_lookup --list           # 列出所有可用期刊
+python -m core.journal_lookup "IEEE TRO"      # 查询期刊 RSS 地址
+python main.py --sources rss_journals          # 按 RSS_JOURNALS 环境变量订阅
 ```
 
 ## 完整日报机
@@ -349,8 +360,11 @@ SMTP_SENDER=xxx
 SMTP_RECEIVER=xxx
 SMTP_PASSWORD=xxx
 DAILY_SOURCES="arxiv semanticscholar huggingface rss"
+WEEKLY_SOURCES="twitter pubmed rss_journals"
+WEEKLY_DAY=Monday
 HF_CONTENT_TYPES="papers"
 RSS_URLS="https://imjuya.github.io/juya-ai-daily/rss.xml"
+RSS_JOURNALS="IEEE TRO|IEEE RAL|IJRR|Science Robotics"
 GENERATE_REPORT=1
 SEND_REPORT_EMAIL=1
 GENERATE_IDEAS=1
@@ -585,13 +599,13 @@ A：当前实现是指令式模式，只处理 `/help`、`/status`、`/run`、`/
 ```
 你的兴趣画像 + Google Scholar（支持多个）
      ↓
-┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐
-│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar │  │ X/Twitter │  │  Zotero   │
-└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘
-     │              │              │                 │                 │              │
-     └──────────────┴──────────────┴────────┬────────┴─────────────────┴──────────────┘
+┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐  ┌──────────────┐
+│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar │  │ X/Twitter │  │  Zotero   │  │ RSS Journals │
+└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘  └──────┬───────┘
+     │              │              │                 │                 │              │               │
+     └──────────────┴──────────────┴────────┬────────┴─────────────────┴──────────────┴───────────────┘
                                              ↓
-                         LLM 评分 + 筛选 (含 Zotero 相似度辅助重排序)
+                          LLM 评分 + 筛选 (含 Zotero 相似度辅助重排序)
                                             ↓
                                ┌────────────┼────────────┐
                                ↓            ↓            ↓
@@ -618,6 +632,7 @@ A：当前实现是指令式模式，只处理 `/help`、`/status`、`/run`、`/
 - **🛡️ 书安 InternShannon Skill** — 内置 [`skills/ideer-daily-paper-chatbot/SKILL.md`](./skills/ideer-daily-paper-chatbot/SKILL.md)，让书安 Agent 代读 raw items，自己生成摘要、评分、报告和 ideas
 - **📚 Zotero 自动同步** — Swipe 右划自动存入 Zotero；每日推荐高分论文一键同步；资料库批量导出。需要 Zotero 7 + `zotero_save.py`
 - **📚 Zotero 辅助选文** — 基于你的 Zotero 文献库 TF-IDF 相似度 + 研究者画像匹配，对每日推荐进行二次排序，把与你研究积累更相关的论文优先推送
+- **📚 期刊 RSS 订阅** — 独立源 `rss_journals`，输入期刊名称（如 `IEEE TRO`、`Science Robotics`），自动解析 RSS feed 地址，每周定时抓取最新论文。预置 12 个机器人学/控制领域期刊，支持用户自定义扩展
 - **📚 Add to Library** — 在 arXiv 邮件中一键创建 GitHub Issue，将论文信息自动传递到指定仓库，便于后续自动化处理（如自动下载 PDF、分类归档等）
 
 ## 用 Agent 做每日论文自动化

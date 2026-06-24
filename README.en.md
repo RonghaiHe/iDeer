@@ -84,6 +84,10 @@ This is more than RSS. iDeer **scores, ranks, summarizes, and connects signals a
 | **arXiv** | Daily new papers | categories such as `cs.AI`, `cs.CL`, `cs.CV` |
 | **Semantic Scholar** | 200M+ academic papers | queries, year, field, result limit |
 | **X / Twitter** | Technical discussion and industry chatter | account list, discovery, lookback window |
+| **RSS** | Any RSS/Atom feed | XML URL list, runs daily |
+| **RSS Journals** | Pre-built + custom journal feeds | journal name list, runs weekly |
+
+> **RSS Journals** — A standalone source. Enter journal names (e.g. `IEEE TRO`, `IJRR`) and iDeer automatically resolves the corresponding RSS feed URLs. Ships with 12 pre-built robotics/control journals and supports user-defined extensions. See `data/journal_rss.json`. Included in `WEEKLY_SOURCES` by default (runs weekly). The journal source max items is controlled by `RSS_JOURNAL_MAX_ITEMS` (default 50), separate from generic RSS `RSS_MAX_ITEMS` (default 30).
 
 > **Plugin-style architecture**: add a new source by extending `BaseSource`, implementing the abstract methods, and registering it in `SOURCE_REGISTRY`.
 
@@ -121,10 +125,11 @@ SMTP_SENDER=xxx
 SMTP_RECEIVER=xxx
 SMTP_PASSWORD=xxx
 DAILY_SOURCES="arxiv semanticscholar huggingface rss"
-WEEKLY_SOURCES="twitter pubmed"    # run only on Monday (configurable via WEEKLY_DAY)
+WEEKLY_SOURCES="twitter pubmed rss_journals"    # run only on Monday (configurable via WEEKLY_DAY)
 WEEKLY_DAY=Monday
 HF_CONTENT_TYPES="papers"
 RSS_URLS="https://imjuya.github.io/juya-ai-daily/rss.xml"
+RSS_JOURNALS="IEEE TRO|IEEE RAL|IJRR|Science Robotics"
 GENERATE_REPORT=1
 SEND_REPORT_EMAIL=1
 GENERATE_IDEAS=1
@@ -150,11 +155,11 @@ Supported frequencies: **daily, weekdays, weekly, monthly**.
 ```text
 Your interest profile + Google Scholar (multiple profiles supported)
      ↓
-┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐
-│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar│  │ X/Twitter │  │  Zotero   │
-└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘
-     │              │              │                │                 │              │
-     └──────────────┴──────────────┴────────┬───────┴─────────────────┴──────────────┘
+┌─────────┐  ┌──────────────┐  ┌────────┐  ┌─────────────────┐  ┌───────────┐  ┌───────────┐  ┌──────────────┐
+│ GitHub  │  │ HuggingFace  │  │ arXiv  │  │ Semantic Scholar│  │ X/Twitter │  │  Zotero   │  │ RSS Journals │
+└────┬────┘  └──────┬───────┘  └───┬────┘  └────────┬────────┘  └─────┬─────┘  └─────┬─────┘  └──────┬───────┘
+     │              │              │                │                 │              │               │
+     └──────────────┴──────────────┴────────┬───────┴─────────────────┴──────────────┴───────────────┘
                                             ↓
                      LLM scoring + filtering (Zotero similarity re-ranking)
                                             ↓
@@ -178,6 +183,7 @@ Your interest profile + Google Scholar (multiple profiles supported)
 - **🔌 Claude Code Skill**: use iDeer as a Claude Code skill.
 - **🤖 Codex Daily Paper Skill**: use [skills/ideer-daily-paper/SKILL.md](./skills/ideer-daily-paper/SKILL.md) to teach Codex how to run daily paper reading, summarization, email delivery, and automation setup in a consistent way.
 - **📚 Zotero paper re-ranking**: re-rank daily recommendations against your Zotero library via TF-IDF similarity plus researcher profile overlap.
+- **📚 Journal RSS subscriptions**: a standalone `rss_journals` source. Enter journal names (e.g. `IEEE TRO`, `Science Robotics`) to automatically resolve RSS feed URLs and fetch latest papers weekly. Ships with 12 pre-built robotics/control journals, extensible via `data/journal_rss.json`.
 - **📚 Add to Library**: create a GitHub Issue directly from arXiv emails with one click, automatically passing paper information to a target repository for further automation (e.g., auto-download PDF, classification, archival).
 
 ## Using Codex for Daily Paper Automation

@@ -78,6 +78,45 @@ class RssFetcherTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0]["title"], "Agent Safety Weekly")
 
+    def test_fetch_rss_feeds_fetches_all_feeds_before_trimming(self):
+        from fetchers.rss_fetcher import fetch_rss_feeds
+
+        feed_a = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0"><channel>
+            <title>Feed A</title>
+            <item><title>A1</title><link>https://a.com/1</link></item>
+            <item><title>A2</title><link>https://a.com/2</link></item>
+        </channel></rss>"""
+
+        feed_b = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0"><channel>
+            <title>Feed B</title>
+            <item><title>B1</title><link>https://b.com/1</link></item>
+        </channel></rss>"""
+
+        responses = {
+            "https://feed-a.example.com/rss": feed_a,
+            "https://feed-b.example.com/rss": feed_b,
+        }
+
+        def mock_get(url, **kwargs):
+            class Resp:
+                def __init__(self, text):
+                    self.text = text
+                def raise_for_status(self):
+                    return None
+            return Resp(responses[url])
+
+        with patch("fetchers.rss_fetcher.requests.get", side_effect=mock_get) as get:
+            items = fetch_rss_feeds(
+                ["https://feed-a.example.com/rss", "https://feed-b.example.com/rss"],
+                max_items=1,
+            )
+
+        self.assertEqual(get.call_count, 2)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["title"], "A1")
+
 
 class RssIntegrationTest(unittest.TestCase):
     def test_rss_source_is_registered(self):

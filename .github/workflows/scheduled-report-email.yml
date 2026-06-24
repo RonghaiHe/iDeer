@@ -68,6 +68,8 @@ jobs:
       IDEER_HF_MAX_MODELS: ${{ secrets.IDEER_HF_MAX_MODELS }}
       IDEER_RSS_URLS: ${{ secrets.IDEER_RSS_URLS }}
       IDEER_RSS_MAX_ITEMS: ${{ secrets.IDEER_RSS_MAX_ITEMS }}
+      IDEER_RSS_JOURNALS: ${{ secrets.IDEER_RSS_JOURNALS }}
+      IDEER_RSS_JOURNAL_MAX_ITEMS: ${{ secrets.IDEER_RSS_JOURNAL_MAX_ITEMS }}
       IDEER_SS_QUERIES: ${{ secrets.IDEER_SS_QUERIES }}
       IDEER_SS_MAX_RESULTS: ${{ secrets.IDEER_SS_MAX_RESULTS }}
       IDEER_SS_MAX_PAPERS: ${{ secrets.IDEER_SS_MAX_PAPERS }}
@@ -148,3 +150,4 @@ jobs:
             history/twitter/**
             history/pubmed/**
             history/rss/**
+            history/rss_journals/**

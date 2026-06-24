@@ -43,10 +43,8 @@ def fetch_rss_feeds(
                 continue
             seen_items.add(key)
             items.append(item)
-            if len(items) >= max_items:
-                return items
 
-    return items
+    return items[:max_items]
 
 
 def parse_rss_feed(
@@ -61,6 +59,8 @@ def parse_rss_feed(
 
     if channel is not None:
         raw_items = _find_children(channel, "item")
+        if not raw_items:
+            raw_items = _find_children(root, "item")
     else:
         raw_items = _find_children(root, "entry")
 
