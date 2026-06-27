@@ -14,13 +14,15 @@ def get_paper_block_html(
     rate: str,
     authors: str,
     venue: str,
+    venue_type: str,
     year: str,
     citations: int,
     summary: str,
     paper_url: str,
     zotero_save_url: str = "",
 ) -> str:
-    venue_line = f"<strong>Venue:</strong> {venue}" if venue else ""
+    venue_label = f" ({venue_type})" if venue_type else ""
+    venue_line = f"<strong>Venue:</strong> {venue}{venue_label}" if venue else ""
     zotero_btn = ""
     if zotero_save_url:
         zotero_btn = (

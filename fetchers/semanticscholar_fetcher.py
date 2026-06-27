@@ -185,6 +185,7 @@ def _normalize_paper(raw: dict[str, Any]) -> dict[str, Any]:
 
     venue = raw.get("publicationVenue") or {}
     venue_name = venue.get("name", "") if isinstance(venue, dict) else ""
+    venue_type = venue.get("type", "") if isinstance(venue, dict) else ""
 
     external = raw.get("externalIds") or {}
     arxiv_id = external.get("ArXiv", "")
@@ -206,6 +207,7 @@ def _normalize_paper(raw: dict[str, Any]) -> dict[str, Any]:
         "reference_count": raw.get("referenceCount") or 0,
         "authors": author_names,
         "venue": venue_name,
+        "venue_type": venue_type,
         "arxiv_id": arxiv_id,
         "doi": doi,
         "publication_date": raw.get("publicationDate") or "",

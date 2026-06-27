@@ -153,6 +153,9 @@ class SemanticScholarSource(BaseSource):
         if len(abstract) > 600:
             abstract = abstract[:597] + "..."
 
+        venue_type = item.get("venue_type", "")
+        venue_display = f"{item.get('venue', '')} ({venue_type})" if venue_type else item.get('venue', '')
+
         return f"""你是一个有帮助的学术研究助手，可以帮助我构建每日论文推荐系统。
 以下是我最近研究领域的描述：
 {self.description}
@@ -161,7 +164,7 @@ class SemanticScholarSource(BaseSource):
 标题: {item['title']}
 作者: {item.get('authors', '')}
 年份: {item.get('year', '')}
-发表期刊/会议: {item.get('venue', '')}
+发表期刊/会议: {venue_display}
 引用数: {item.get('citation_count', 0)}
 摘要: {abstract}
 
@@ -190,6 +193,7 @@ class SemanticScholarSource(BaseSource):
             "doi": item.get("doi", ""),
             "authors": item.get("authors", ""),
             "venue": item.get("venue", ""),
+            "venue_type": item.get("venue_type", ""),
             "year": str(item.get("year", "")),
             "citation_count": item.get("citation_count", 0),
         }
@@ -209,6 +213,7 @@ class SemanticScholarSource(BaseSource):
             rate,
             item.get("authors", ""),
             item.get("venue", ""),
+            item.get("venue_type", ""),
             str(item.get("year", "")),
             item.get("citation_count", 0),
             item["summary"],
@@ -227,7 +232,9 @@ class SemanticScholarSource(BaseSource):
         lines = []
         for i, r in enumerate(recommendations):
             venue = r.get("venue", "")
-            venue_str = f" [{venue}]" if venue else ""
+            venue_type = r.get("venue_type", "")
+            venue_label = f" ({venue_type})" if venue_type else ""
+            venue_str = f" [{venue}{venue_label}]" if venue else ""
             lines.append(
                 f"{i + 1}. {r['title']}{venue_str} "
                 f"(citations={r.get('citation_count', 0)}) "
