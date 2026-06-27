@@ -42,6 +42,18 @@ def search(query: str, registry: dict[str, Any] | None = None) -> tuple[str, dic
     return None
 
 
+def search_by_feed_url(feed_url: str, registry: dict[str, Any] | None = None) -> tuple[str, dict] | None:
+    """Match a feed URL against the registry and return (key, entry) if found."""
+    if registry is None:
+        registry = load_registry()
+    feed_lower = feed_url.strip().lower()
+    for key, entry in registry.items():
+        rss_url = (entry.get("rss_url") or "").strip().lower()
+        if rss_url and rss_url == feed_lower:
+            return key, entry
+    return None
+
+
 def resolve_urls(journal_names: list[str], registry: dict[str, Any] | None = None) -> list[str]:
     """Resolve a list of journal names to RSS feed URLs.
 

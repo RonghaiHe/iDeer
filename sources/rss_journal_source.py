@@ -1,12 +1,13 @@
 import argparse
 import hashlib
-import html
 import json
 import os
+from urllib.parse import quote
 
 from core.config import LLMConfig, CommonConfig
-from core.journal_lookup import resolve_urls
+from core.journal_lookup import resolve_urls, load_registry
 from email_utils.base_template import get_stars
+from email_utils.rss_journal_template import get_journal_paper_block_html
 from fetchers.rss_fetcher import fetch_rss_feeds
 from sources.base import BaseSource
 
@@ -23,6 +24,13 @@ class RssJournalSource(BaseSource):
         self.urls = resolve_urls(journal_names) if journal_names else []
         if not self.urls:
             print(f"[{self.name}] No journal URLs resolved — source will produce no items.")
+
+        registry = load_registry()
+        self._url_to_journal: dict[str, tuple[str, dict]] = {}
+        for key, entry in registry.items():
+            rss_url = (entry.get("rss_url") or "").strip()
+            if rss_url:
+                self._url_to_journal[rss_url.lower()] = (key, entry)
 
         url_sig = hashlib.sha256("|".join(sorted(self.urls)).encode()).hexdigest()[:10]
         cache_key = f"items_{url_sig}_{self.max_items}"
@@ -103,6 +111,16 @@ class RssJournalSource(BaseSource):
     def parse_eval_response(self, item: dict, response: str) -> dict:
         response = response.strip("```").strip("json")
         data = json.loads(response)
+
+        feed_url = item.get("feed_url", "")
+        journal_name = item.get("source_label", "Journal RSS")
+        journal_full_name = ""
+        if feed_url:
+            match = self._url_to_journal.get(feed_url.strip().lower())
+            if match:
+                journal_name = match[0]
+                journal_full_name = match[1].get("full_name", "")
+
         return {
             "title": item.get("title", "Untitled"),
             "summary": self._ensure_str(data["summary"]),
@@ -110,29 +128,33 @@ class RssJournalSource(BaseSource):
             "url": item.get("url", ""),
             "abstract": item.get("abstract", ""),
             "published_at": item.get("published_at", ""),
-            "feed_url": item.get("feed_url", ""),
+            "feed_url": feed_url,
             "source_label": item.get("source_label", "Journal RSS"),
+            "journal_name": journal_name,
+            "journal_full_name": journal_full_name,
         }
 
     def render_item_html(self, item: dict) -> str:
         rate = get_stars(item.get("score", 0))
-        title = html.escape(item.get("title", "Untitled"))
-        summary = html.escape(item.get("summary", ""))
-        url = html.escape(item.get("url", ""))
-        source_label = html.escape(item.get("source_label", "Journal RSS"))
-        published_at = html.escape(item.get("published_at", ""))
-        meta = " · ".join(part for part in [source_label, published_at] if part)
-        meta_html = f'<p style="color:#6b7280;margin:4px 0 8px 0;">{meta}</p>' if meta else ""
-        link_html = f'<p><a href="{url}">Open item</a></p>' if url else ""
-        return f"""
-        <div class="recommendation-item">
-          <h3>{title}</h3>
-          <p>{rate}</p>
-          {meta_html}
-          <p>{summary}</p>
-          {link_html}
-        </div>
-        """
+        title = item.get("title", "Untitled")
+        summary = item.get("summary", "")
+        url = item.get("url", "")
+        journal_name = item.get("journal_name", item.get("source_label", "Journal RSS"))
+        journal_full_name = item.get("journal_full_name", "")
+        published_at = item.get("published_at", "")
+
+        zotero_save = f"https://www.zotero.org/save/?q={quote(url, safe='')}" if url else ""
+
+        return get_journal_paper_block_html(
+            title=title,
+            rate=rate,
+            journal_name=journal_name,
+            journal_full_name=journal_full_name,
+            published_at=published_at,
+            summary=summary,
+            paper_url=url,
+            zotero_save_url=zotero_save,
+        )
 
     def get_theme_color(self) -> str:
         return "5,150,105"
