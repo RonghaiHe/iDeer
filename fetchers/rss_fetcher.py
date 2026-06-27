@@ -77,6 +77,9 @@ def parse_rss_feed(
         )
         summary = _strip_html(html_content)
 
+        # Extract authors from dc:creator, author, or itunes:author tags
+        authors = _extract_authors(raw)
+
         cache_basis = guid or link or title
         items.append(
             {
@@ -88,6 +91,7 @@ def parse_rss_feed(
                 "feed_url": feed_url,
                 "source_label": inferred_label,
                 "cache_id": "rss_" + _safe_cache_id(cache_basis),
+                "authors": authors,
             }
         )
 
@@ -148,6 +152,34 @@ def _extract_link(element: ET.Element) -> str:
             if href:
                 return href
     return ""
+
+
+def _extract_authors(element: ET.Element) -> str:
+    """Extract authors from dc:creator, author, authors, or itunes:author tags."""
+    authors = []
+    seen = set()
+
+    for tag_name in ["creator", "author", "authors", "itunes:author"]:
+        for child in list(element):
+            local = _local_name(child.tag)
+            if local == tag_name or child.tag == tag_name:
+                raw = "".join(child.itertext()).strip()
+                if not raw:
+                    continue
+                # Handle semicolon-separated (IEEE) or comma-separated lists
+                parts = re.split(r"[;,]\s*", raw)
+                for part in parts:
+                    name = part.strip()
+                    if name and name.lower() not in seen:
+                        seen.add(name.lower())
+                        authors.append(name)
+                        if len(authors) >= 10:
+                            break
+                if len(authors) >= 10:
+                    break
+        if len(authors) >= 10:
+            break
+    return ", ".join(authors)
 
 
 def _strip_html(text: str) -> str:

@@ -86,6 +86,8 @@ class RssJournalSource(BaseSource):
         summary = item.get("summary") or item.get("abstract") or "No summary available."
         if len(summary) > 1200:
             summary = summary[:1197] + "..."
+        authors = item.get("authors", "")
+        authors_line = f"作者: {authors}\n" if authors else ""
         return f"""你是一个有帮助的信息筛选助手，可以帮助我构建每日 AI 信息源摘要。
 以下是我最近研究领域的描述：
 {self.description}
@@ -93,7 +95,7 @@ class RssJournalSource(BaseSource):
 以下是来自期刊 RSS 订阅的论文：
 来源: {item.get('source_label', 'Journal RSS')}
 标题: {item.get('title', '')}
-发布时间: {item.get('published_at', '')}
+{authors_line}发布时间: {item.get('published_at', '')}
 内容: {summary}
 
 1. 用中文总结这条信息的主要内容。
@@ -132,6 +134,7 @@ class RssJournalSource(BaseSource):
             "source_label": item.get("source_label", "Journal RSS"),
             "journal_name": journal_name,
             "journal_full_name": journal_full_name,
+            "authors": item.get("authors", ""),
         }
 
     def render_item_html(self, item: dict) -> str:
@@ -142,6 +145,7 @@ class RssJournalSource(BaseSource):
         journal_name = item.get("journal_name", item.get("source_label", "Journal RSS"))
         journal_full_name = item.get("journal_full_name", "")
         published_at = item.get("published_at", "")
+        authors = item.get("authors", "")
 
         zotero_save = f"https://www.zotero.org/save/?q={quote(url, safe='')}" if url else ""
 
@@ -154,6 +158,7 @@ class RssJournalSource(BaseSource):
             summary=summary,
             paper_url=url,
             zotero_save_url=zotero_save,
+            authors=authors,
         )
 
     def get_theme_color(self) -> str:

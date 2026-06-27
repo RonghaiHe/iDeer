@@ -21,6 +21,7 @@ def get_journal_paper_block_html(
     summary: str,
     paper_url: str,
     zotero_save_url: str = "",
+    authors: str = "",
 ) -> str:
     journal_label = f"{journal_name} ({journal_full_name})" if journal_full_name and journal_full_name != journal_name else journal_name
     zotero_btn = ""
@@ -32,6 +33,22 @@ def get_journal_paper_block_html(
             f'padding:8px 16px;border-radius:6px;margin-left:8px;">'
             f'<img src="{_zotero_logo_src}" style="{_icon_style_zotero}" alt="">Save to Zotero</a>'
         )
+
+    # Format authors display
+    authors_html = ""
+    if authors:
+        author_list = [a.strip() for a in authors.split(",") if a.strip()]
+        if len(author_list) > 3:
+            authors_display = ", ".join(author_list[:3]) + f" ..., {author_list[-1]}. ({len(author_list)} authors)"
+        else:
+            authors_display = authors
+        authors_html = f"""
+    <tr>
+        <td style="font-size: 13px; color: #666; padding: 4px 0;">
+            <strong>Authors:</strong> {authors_display}
+        </td>
+    </tr>"""
+
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%%"
            style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px;
@@ -55,6 +72,7 @@ def get_journal_paper_block_html(
             {published_at_html}
         </td>
     </tr>
+    {authors_html}
     <tr>
         <td style="font-size: 14px; color: #333; padding: 8px 0;">
             <strong>TLDR:</strong> {summary}
@@ -81,6 +99,7 @@ def get_journal_paper_block_html(
         rate=rate,
         journal_label=journal_label,
         published_at_html=published_at_html,
+        authors_html=authors_html,
         summary=summary,
         paper_url=paper_url,
         zotero_row=zotero_btn,
