@@ -29,6 +29,8 @@ class SemanticScholarSource(BaseSource):
         self.fields_of_study = source_args.get("fields_of_study", [])
         self.sort = source_args.get("sort", DEFAULT_SORT)
         self.api_key = source_args.get("api_key", "")
+        self.github_target_owner = source_args.get("github_target_owner", "")
+        self.github_target_repo = source_args.get("github_target_repo", "")
 
         # If no explicit queries, derive from the interest description
         if not self.queries:
@@ -135,6 +137,8 @@ class SemanticScholarSource(BaseSource):
             "fields_of_study": args.ss_fields_of_study,
             "sort": args.ss_sort,
             "api_key": args.ss_api_key,
+            "github_target_owner": args.github_target_owner,
+            "github_target_repo": args.github_target_repo,
         }
 
     def get_max_items(self) -> int:
@@ -208,6 +212,22 @@ class SemanticScholarSource(BaseSource):
         else:
             s2_url = item.get("url", "")
             zotero_save = f"https://www.zotero.org/save/?q={quote(s2_url, safe='')}" if s2_url else ""
+
+        github_url = ""
+        if self.github_target_owner and self.github_target_repo:
+            arxiv_id = item.get("arxiv_id", "")
+            issue_title = item["title"]
+            issue_body = (
+                f"arxiv_id: {arxiv_id}\n"
+                f"title: {item['title']}\n"
+                f"url: {paper_url}"
+            )
+            github_url = (
+                f"https://github.com/{self.github_target_owner}/{self.github_target_repo}/issues/new"
+                f"?title={quote(issue_title)}"
+                f"&body={quote(issue_body)}"
+            )
+
         return get_paper_block_html(
             item["title"],
             rate,
@@ -219,6 +239,8 @@ class SemanticScholarSource(BaseSource):
             item["summary"],
             paper_url,
             zotero_save_url=zotero_save,
+            arxiv_id=item.get("arxiv_id", ""),
+            github_issue_url=github_url,
         )
 
     def get_theme_color(self) -> str:

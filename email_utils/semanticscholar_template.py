@@ -3,9 +3,13 @@ from pathlib import Path
 
 _brand_dir = Path(__file__).resolve().parent.parent / "docs" / "brand"
 
+with open(_brand_dir / "alphaxiv.png", "rb") as f:
+    _alphaxiv_logo_src = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+
 with open(_brand_dir / "zotero.png", "rb") as f:
     _zotero_logo_src = "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
+_icon_style = "height:14px;vertical-align:middle;margin-right:4px;"
 _icon_style_zotero = "height:14px;vertical-align:middle;margin-right:4px;"
 
 
@@ -20,6 +24,8 @@ def get_paper_block_html(
     summary: str,
     paper_url: str,
     zotero_save_url: str = "",
+    arxiv_id: str = "",
+    github_issue_url: str = "",
 ) -> str:
     venue_label = f" ({venue_type})" if venue_type else ""
     venue_line = f"<strong>Venue:</strong> {venue}{venue_label}" if venue else ""
@@ -31,6 +37,24 @@ def get_paper_block_html(
             f'font-weight:bold;color:#fff;background-color:#6c3ec1;'
             f'padding:8px 16px;border-radius:6px;margin-left:8px;">'
             f'<img src="{_zotero_logo_src}" style="{_icon_style_zotero}" alt="">Save to Zotero</a>'
+        )
+    alphaxiv_btn = ""
+    if arxiv_id:
+        alphaxiv_btn = (
+            f'<a href="https://www.alphaxiv.org/abs/{arxiv_id}" '
+            f'style="display:inline-block;text-decoration:none;font-size:14px;'
+            f'font-weight:bold;color:#fff;background-color:#6c3ec1;'
+            f'padding:8px 16px;border-radius:6px;margin-left:8px;">'
+            f'<img src="{_alphaxiv_logo_src}" style="{_icon_style}" alt="">AlphaXiv</a>'
+        )
+    github_btn = ""
+    if github_issue_url:
+        github_btn = (
+            '<a href="{url}" '
+            'style="display:inline-block;text-decoration:none;font-size:14px;'
+            'font-weight:bold;color:#fff;background-color:#6c3ec1;'
+            'padding:8px 16px;border-radius:6px;margin-left:8px;">'
+            '\U0001f4da Add to Online Paper Reader</a>'.format(url=github_issue_url)
         )
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%%"
@@ -64,6 +88,8 @@ def get_paper_block_html(
                       font-weight: bold; color: #fff; background-color: #6c3ec1;
                       padding: 8px 16px; border-radius: 6px;">View Paper</a>
             {zotero_row}
+            {alphaxiv_row}
+            {github_row}
         </td>
     </tr>
 </table>
@@ -83,4 +109,6 @@ def get_paper_block_html(
         summary=summary,
         paper_url=paper_url,
         zotero_row=zotero_btn,
+        alphaxiv_row=alphaxiv_btn,
+        github_row=github_btn,
     )
