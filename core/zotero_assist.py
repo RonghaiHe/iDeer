@@ -1,13 +1,18 @@
 from __future__ import annotations
 
+import logging
 import math
 import re
+import time
 from collections import Counter
 from fnmatch import fnmatchcase
 from pathlib import Path, PurePosixPath
 from typing import Any
+from urllib.error import URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -52,13 +57,17 @@ class ZoteroCorpusClient:
         api_key: str,
         include_path: list[str] | None = None,
         ignore_path: list[str] | None = None,
-        timeout_seconds: int = 20,
+        timeout_seconds: int = 30,
+        max_retries: int = 3,
+        retry_backoff: float = 2.0,
     ) -> None:
         self.user_id = user_id
         self.api_key = api_key
         self.include_path = include_path or []
         self.ignore_path = ignore_path or []
         self.timeout_seconds = timeout_seconds
+        self.max_retries = max_retries
+        self.retry_backoff = retry_backoff
         self.base = f"https://api.zotero.org/users/{user_id}"
         self.headers = {"Zotero-API-Key": api_key}
 
@@ -67,14 +76,32 @@ class ZoteroCorpusClient:
         url = f"{self.base}/{path}"
         if query:
             url = f"{url}?{query}"
-        req = Request(url=url, headers=self.headers, method="GET")
-        with urlopen(req, timeout=self.timeout_seconds) as resp:
-            body = resp.read().decode("utf-8", errors="ignore")
-        import json
-        payload = json.loads(body)
-        if not isinstance(payload, list):
-            return []
-        return payload
+        last_exc: Exception | None = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                req = Request(url=url, headers=self.headers, method="GET")
+                with urlopen(req, timeout=self.timeout_seconds) as resp:
+                    body = resp.read().decode("utf-8", errors="ignore")
+                import json
+                payload = json.loads(body)
+                if not isinstance(payload, list):
+                    return []
+                return payload
+            except (TimeoutError, URLError, OSError) as exc:
+                last_exc = exc
+                if attempt < self.max_retries:
+                    wait = self.retry_backoff ** attempt
+                    logger.warning(
+                        "Zotero API request to %s failed (attempt %d/%d): %s. Retrying in %.1fs...",
+                        url, attempt, self.max_retries, exc, wait,
+                    )
+                    time.sleep(wait)
+                else:
+                    logger.error(
+                        "Zotero API request to %s failed after %d attempts: %s",
+                        url, self.max_retries, exc,
+                    )
+        raise last_exc  # type: ignore[misc]
 
     def _fetch_collections(self) -> dict[str, dict[str, Any]]:
         start = 0
@@ -211,6 +238,8 @@ def assist_recommendations_with_zotero(
     weight: float = 1.5,
     top_k_per_source: int = 0,
     max_corpus_items: int = 2000,
+    timeout_seconds: int = 30,
+    max_retries: int = 3,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
     if not user_id:
         raise ValueError("Zotero user ID is required.")
@@ -222,6 +251,8 @@ def assist_recommendations_with_zotero(
         api_key=api_key,
         include_path=include_path,
         ignore_path=ignore_path,
+        timeout_seconds=timeout_seconds,
+        max_retries=max_retries,
     )
     corpus = client.fetch_corpus(max_items=max_corpus_items)
     if not corpus:
