@@ -22,6 +22,7 @@ def get_paper_block_html(
     arxiv_id: str,
     summary: str,
     pdf_url: str,
+    authors: str = "",
     zotero_save_url: str = "",
     github_issue_url: str = "",
 ) -> str:
@@ -43,6 +44,21 @@ def get_paper_block_html(
             'padding:8px 16px;border-radius:6px;margin-left:8px;">'
             '\U0001f4da Add to Online Paper Reader</a>'.format(url=github_issue_url)
         )
+    # Format authors display
+    authors_html = ""
+    if authors:
+        author_list = [a.strip() for a in authors.split(",") if a.strip()]
+        if len(author_list) > 3:
+            authors_display = ", ".join(author_list[:3]) + f" ..., {author_list[-1]}. ({len(author_list)} authors)"
+        else:
+            authors_display = ", ".join(author_list)
+        authors_html = f"""
+    <tr>
+        <td style="font-size: 13px; color: #57606a; padding: 4px 0;">
+            <strong>Authors:</strong> {authors_display}
+        </td>
+    </tr>"""
+
     return f"""
     <table border="0" cellpadding="0" cellspacing="0" width="100%"
            style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px;
@@ -51,7 +67,7 @@ def get_paper_block_html(
         <td style="font-size: 20px; font-weight: bold; color: #333;">
             {title}
         </td>
-    </tr>
+    </tr>{authors_html}
     <tr>
         <td style="font-size: 14px; color: #333; padding: 8px 0;">
             <strong>Relevance:</strong> {rate}

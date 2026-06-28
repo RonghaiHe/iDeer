@@ -110,6 +110,7 @@ class ArxivSource(BaseSource):
             "score": float(data["relevance"]),
             "pdf_url": item.get("pdf_url", ""),
             "url": item.get("abstract_url", "") or item.get("pdf_url", ""),
+            "authors": item.get("authors", ""),
         }
 
     def render_item_html(self, item: dict) -> str:
@@ -143,6 +144,7 @@ class ArxivSource(BaseSource):
             item.get("arxiv_id", ""),
             item["summary"],
             item.get("pdf_url", ""),
+            authors=item.get("authors", ""),
             zotero_save_url=zotero_save,
             github_issue_url=github_url,
         )

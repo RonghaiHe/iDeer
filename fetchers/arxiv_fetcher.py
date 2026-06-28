@@ -45,12 +45,22 @@ def get_arxiv_new_papers(category: str = "cs.CV", max_results: int = 100) -> lis
 
         arxiv_id = pdf_url.split("/")[-1] if pdf_url else ""
 
+        # Extract authors from list-authors div
+        authors_tag = entries[i + 1].find("div", class_="list-authors")
+        authors = []
+        if authors_tag:
+            for author_link in authors_tag.find_all("a"):
+                author_name = author_link.text.strip()
+                if author_name:
+                    authors.append(author_name)
+
         papers.append({
             "title": title,
             "arxiv_id": arxiv_id,
             "abstract": abstract,
             "pdf_url": pdf_url,
             "abstract_url": abs_url,
+            "authors": ", ".join(authors),
         })
 
         if len(papers) >= max_results:
