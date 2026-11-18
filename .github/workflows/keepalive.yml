@@ -1,0 +1,63 @@
+name: Repository Keepalive
+
+# GitHub disables scheduled workflows in public repositories after 60 days
+# without repository activity. This job runs monthly, checks how old the last
+# commit is, and pushes an empty commit when the repository has been idle for
+# more than one month so that the schedules keep running.
+
+on:
+  schedule:
+    # 00:05 UTC on the 1st of every month
+    - cron: "5 0 1 * *"
+  workflow_dispatch:
+    inputs:
+      force_commit:
+        description: "Push the keepalive commit even if the last commit is recent"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repository-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit a blank when the last commit is older than one month
+        env:
+          FORCE_COMMIT: ${{ github.event.inputs.force_commit }}
+          MAX_AGE_DAYS: "30"
+        run: |
+          set -euo pipefail
+
+          LAST_COMMIT_TS="$(git log -1 --format=%ct)"
+          NOW_TS="$(date -u +%s)"
+          AGE_SECONDS=$(( NOW_TS - LAST_COMMIT_TS ))
+          AGE_DAYS=$(( AGE_SECONDS / 86400 ))
+          MAX_AGE_SECONDS=$(( MAX_AGE_DAYS * 86400 ))
+
+          echo "Latest commit: $(git log -1 --format='%h %ad %s' --date=iso-strict)"
+          echo "Commit age: ${AGE_DAYS} day(s), threshold: ${MAX_AGE_DAYS} day(s)"
+
+          if [ "${FORCE_COMMIT:-false}" != "true" ] && [ "${AGE_SECONDS}" -le "${MAX_AGE_SECONDS}" ]; then
+            echo "Repository is still active; no keepalive commit needed."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git commit --allow-empty -m "chore: monthly keepalive commit [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
